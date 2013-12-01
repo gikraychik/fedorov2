@@ -10,24 +10,23 @@
 #include "stdafx.h"
 #include <iostream>
 #include <time.h>
-#include <conio.h>
 
 typedef __int64 GF2_64;  // элемент поля GF2_64 будет храниться в __int64
 using namespace std;
 
 const int size = 8 * sizeof(GF2_64);  // размер в битах типа данных GF2_64
 
-extern "C" // перечисленные функции написаны на языке ассемблера (см. файл Lab1Func_Kraychik_05.asm)
+extern "C" // перечисленные функции написаны на языке ассемблера (см. файл Lab2Func_Kraychik_05.asm)
 {
 	GF2_64 GF_MulX(GF2_64 a);
 	GF2_64 GF_PowX(unsigned int Power);
-	GF2_64 GF_Multiply(GF2_64 a, GF2_64 b);  // yes done
+	GF2_64 GF_Multiply(GF2_64 a, GF2_64 b);
 	GF2_64 GF_Reciprocal(GF2_64 a);
 	int PolyMulX(GF2_64 *a, int deg);
-	int PolyMulConst(GF2_64 *a, int deg, GF2_64 c);  // yes
-	int PolyZero(GF2_64 *a, int deg);  // yes done
-	int PolyCpy(GF2_64 *dest, GF2_64 *src, unsigned char deg);  // yes
-	int PolySum(GF2_64 *sum, GF2_64 *a, int deg_a, GF2_64 *b, int deg_b);  //yes
+	int PolyMulConst(GF2_64 *a, int deg, GF2_64 c);
+	int PolyZero(GF2_64 *a, int deg);
+	int PolyCpy(GF2_64 *dest, GF2_64 *src, unsigned char deg);
+	int PolySum(GF2_64 *sum, GF2_64 *a, int deg_a, GF2_64 *b, int deg_b);
 }
 
 GF2_64 add_test(GF2_64 a, GF2_64 b)  //складывает два элемента поля
@@ -187,14 +186,6 @@ GF2_64 random()  // возвращает случайный элемент поля GF2_64
 int _tmain(int argc, _TCHAR* argv[])
 {
 	GF2_64 a_test, b_test, c_test;
-	//short m[10] = { -1, -2, -3, -4, 1, 2, 3, 4, 5, 6 };
-	GF2_64 src[5] = { -1, 10, 2 , 3, 4 };
-	GF2_64 dst[5] = { -1, -1, -1, -1, -1 };
- 	int z = PolyZero(dst, -1);
-	a_test = -1;
-	b_test = 1;
-	GF2_64 res = GF_Multiply(a_test, b_test);
-	//sum(m, -1);
 	srand((unsigned)time(NULL));
 	cout << "Testing field functions:" << endl;
 	/*
@@ -309,8 +300,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		delete[] a;
 		delete[] b;
 	}
-	cout << "Press any key to continue..." << endl;
-	_getch();
+	system("pause");
 	return 0;
 }
 

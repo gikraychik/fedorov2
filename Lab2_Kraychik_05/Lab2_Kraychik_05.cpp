@@ -187,6 +187,10 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	GF2_64 a_test, b_test, c_test;
 	srand((unsigned)time(NULL));
+	GF2_64 a[5] = { 1, 2, 3, 4, 5 };
+	GF2_64 b[5] = { 5, 4, 3, 2, 1 };
+	GF2_64 sum[5] = { -1, -1, -1, -1, -1 };
+	int z = PolySum(sum, a, 3, b, 2);
 	cout << "Testing field functions:" << endl;
 	/*
 		Далее идет тестирование функций, написанных на языке ассемблера

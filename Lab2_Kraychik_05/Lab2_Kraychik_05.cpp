@@ -1,5 +1,5 @@
 /*
-	Лабораторная работа №1 по курсу Программирование на языке ассемблера                                
+	Лабораторная работа №2 по курсу Программирование на языке ассемблера                                
 	Вариант №5.                                                                                                                                                
 	Выполнил Георгий Крайчик. Группа 344 
 	
@@ -21,7 +21,7 @@ extern "C" // перечисленные функции написаны на языке ассемблера (см. файл Lab1F
 {
 	GF2_64 GF_MulX(GF2_64 a);
 	GF2_64 GF_PowX(unsigned int Power);
-	GF2_64 GF_Multiply(GF2_64 a, GF2_64 b);  // yes
+	GF2_64 GF_Multiply(GF2_64 a, GF2_64 b);  // yes done
 	GF2_64 GF_Reciprocal(GF2_64 a);
 	int PolyMulX(GF2_64 *a, int deg);
 	int PolyMulConst(GF2_64 *a, int deg, GF2_64 c);  // yes
@@ -188,8 +188,12 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	GF2_64 a_test, b_test, c_test;
 	//short m[10] = { -1, -2, -3, -4, 1, 2, 3, 4, 5, 6 };
-	GF2_64 m[5] = { -1, 10, 2 , 3, 4};
-	int z = PolyZero(m, -1);
+	GF2_64 src[5] = { -1, 10, 2 , 3, 4 };
+	GF2_64 dst[5] = { -1, -1, -1, -1, -1 };
+ 	int z = PolyZero(dst, -1);
+	a_test = -1;
+	b_test = 1;
+	GF2_64 res = GF_Multiply(a_test, b_test);
 	//sum(m, -1);
 	srand((unsigned)time(NULL));
 	cout << "Testing field functions:" << endl;

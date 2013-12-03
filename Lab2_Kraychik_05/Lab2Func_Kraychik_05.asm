@@ -70,6 +70,7 @@ GF_PowX ENDP
 ; Реализация: находится сумма произведений элемента a на каждый бит элемента b
 GF_Multiply PROC						; rcx - a (первый элемент)
 										; rdx - b (второй элемент)
+	ALIGN 16
 	movd xmm0, rcx;						; запись rcx на xmm0
 	movd xmm1, rdx;						; запись rdx на xmm1
 	pclmulqdq xmm0, xmm1, 00h			; умножение многочленов, запись результата в xmm2
@@ -192,6 +193,7 @@ PolyMulConst ENDP
 ; Возвращаемое значение всегда равно -1
 PolyZero PROC							; rcx - указатель на массив a
 										; edx - степень многочлена deg, является типом int
+	ALIGN 16
 	cmp edx, -1							; сравнение deg и -1
 	je m2;								; завершение процедуры, так как многочлен уже равен 0
 	pxor xmm0, xmm0						; обнуление xmm0
@@ -212,16 +214,15 @@ PolyZero PROC							; rcx - указатель на массив a
 	cmove r10, r8						; if (deg нечетна) { r10 = 1; } else { r10 = 0; }
 	mov r8, 0							; счетчик цикла
 	cycle:
-		movdqu xmmword ptr[rcx+8*r8], xmm0		; обнуление сразу же двух коэффицентов многочлена
+		movdqa xmmword ptr[rcx+8*r8], xmm0		; обнуление сразу же двух коэффицентов многочлена
 		add r8, 2								; увеличение счетчика на 2
 		cmp r8, rdx								; сравнение r8 и deg
 		jl cycle								; if (счетчик r8 < deg) { continue; }	
 	add rdx, r10						; восстановление исходного значения deg
 	cmp rax, rdx						; сравнение rax и deg
-	jne odd								; if (rax != deg) { переход к метке odd }
+	jne m2								; if (rax != deg) { переход к метке m2 }
 	xor rax, rax						; rax = 0
 	mov qword ptr[rcx+8*rdx], rax		; запись 0 в последний элемент массива
-	odd:
 	m2:
 	mov eax, -1							; возвращаемая степень многочлена равна -1
 	ret
@@ -306,12 +307,35 @@ PolySum PROC							; rcx - адрес результата (sum)
 		cmp r10, 0
 		jge m2
 	m4:
-	mov rax, r8						; возвращаемым значением является max(deg_a, deg_b)
+	mov rax, r8							; возвращаемым значением является max(deg_a, deg_b)
 	; восстановление значений регистров
 	pop r14
 	pop r13
 	pop r12
 	ret
 PolySum ENDP
+
+; Определяет поддержку процессором различных технологий
+; Input:
+;	rcx - 0 или 1, означает регистр, из которого будет извлекаться информация
+;	0 соответствует регистру rcx, 1 соответствует регистру rdx
+;	rdx - номер бита в данном регистре
+; Output:
+;	возвращет 1, если технология поддерживается
+;	иначе 0
+has_sse PROC							; rcx - 0 или 1: 0 - чтение из ecx, 1 - чтение из edx
+										; rdx - номер бита
+	mov rax, 01h						; параметр для cpuid для получения информации о процессоре
+	mov r8, rdx							; сохранение rdx в r8
+	mov r9, rcx							; сохранение rcx в r9
+	cpuid
+	cmp r9, 0							; сравнение r9 и 0
+	cmovz rdx, rcx						; if (r9 == 0) { rdx = rcx; }
+	xor rax, rax						; rax = 0
+	bt rdx, r8							; копирование бита номер r8 из rdx в флаг CF
+	mov r8, 1							; r8 = 1
+	cmovc rax, r8						; if (cf == 1) { rax = r8; }
+	ret
+has_sse ENDP
 
 END

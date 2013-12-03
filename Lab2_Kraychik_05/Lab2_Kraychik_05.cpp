@@ -15,6 +15,7 @@ typedef __int64 GF2_64;  // элемент поля GF2_64 будет храниться в __int64
 using namespace std;
 
 const int size = 8 * sizeof(GF2_64);  // размер в битах типа данных GF2_64
+typedef enum { ECX, EDX } _register;
 
 extern "C" // перечисленные функции написаны на языке ассемблера (см. файл Lab2Func_Kraychik_05.asm)
 {
@@ -27,6 +28,17 @@ extern "C" // перечисленные функции написаны на языке ассемблера (см. файл Lab2F
 	int PolyZero(GF2_64 *a, int deg);
 	int PolyCpy(GF2_64 *dest, GF2_64 *src, unsigned char deg);
 	int PolySum(GF2_64 *sum, GF2_64 *a, int deg_a, GF2_64 *b, int deg_b);
+
+	/*
+		Определяет поддержку процессором различных технологий
+		Input:
+			reg - RCX или RDX, означает регистр, из которого будет извлекаться информация
+			bit_number - номер бита в данном регистре
+		Output:
+			возвращет true, если конкретная технология поддерживается
+			иначе false
+	*/
+	bool has_sse(_register reg, unsigned int bit_number);
 }
 
 GF2_64 add_test(GF2_64 a, GF2_64 b)  //складывает два элемента поля
@@ -182,9 +194,33 @@ GF2_64 random()  // возвращает случайный элемент поля GF2_64
 	res += (::rand() % 2);
 	return res;
 }
+/*
+	Тестирует процессор на поддержку SSE технологий
+	Возвращает true, если поддерживаются SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2
+	Иначе возвращет false
+*/
+bool test_sse(void)
+{
+	if ((has_sse(ECX, 20)) && (has_sse(ECX, 19)) && (has_sse(ECX, 9)) && (has_sse(ECX, 0)) && (has_sse(ECX, 26)) && (has_sse(ECX, 25)))
+	{
+		return true;
+	}
+	return false;
+}
 
+// основная процедра, точка входа в программу
 int _tmain(int argc, _TCHAR* argv[])
 {
+	if (test_sse())
+	{
+		cout << "Has SSE" << endl;
+	}
+	else
+	{
+		cout << "No SSE" << endl;
+		cout << "Program terminated" << endl;
+		return 0;
+	}
 	GF2_64 a_test, b_test, c_test;
 	srand((unsigned)time(NULL));
 	GF2_64 a[5] = { 1, 2, 3, 4, 5 };

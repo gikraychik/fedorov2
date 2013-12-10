@@ -163,7 +163,7 @@ int PolyCpy_test(GF2_64 *dest, GF2_64 *src, unsigned char deg)  // копирование м
 	return deg;
 }
 
-#define TEST_SIZE 1000  // количество тестов (итераций цикла при тестировании фунцкий)
+#define TEST_SIZE 10000  // количество тестов (итераций цикла при тестировании фунцкий)
 #define ARR_SIZE 100 // максимальный размер массива при тестировании полиномов
 
 bool arrs_eq(GF2_64 *a, int deg_a, GF2_64 *b, int deg_b)  // проверяет равны ли многочлены

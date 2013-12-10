@@ -15,9 +15,9 @@
 ; -------------------------------------------------------------------------------------
 
 .DATA
-	; исользуются в GF_Multiply
+	ALIGN 16								; выравнивание данных на границу 16 байт
+	; исользуется в GF_Multiply
 	Modulo	oword 1Bh						; x^64 + x^4 + x^3 + x + 1 (младшая часть)
-	Mask64	oword 0FFFFFFFFFFFFFFFFh		; x^128 / (x^64 + x^4 + x^3 + x + 1) (младшая часть)
 
 .CODE
 
@@ -59,7 +59,7 @@ GF_PowX PROC							; ecx - Power (unsigned int)
 		jne m2							; if (rcx != 0) { переход к m2 (продолжение цикла); }
 	m1:
 	mov rax, rbp						; на rax находится возвращаемое значение
-	; восстановление значений
+	; восстановление значений из стека
 	pop rbp
 	pop rbx
 	ret
@@ -70,7 +70,6 @@ GF_PowX ENDP
 ; Реализация: находится сумма произведений элемента a на каждый бит элемента b
 GF_Multiply PROC						; rcx - a (первый элемент)
 										; rdx - b (второй элемент)
-	ALIGN 16
 	movd xmm0, rcx;						; запись rcx на xmm0
 	movd xmm1, rdx;						; запись rdx на xmm1
 	pclmulqdq xmm0, xmm1, 00h			; умножение многочленов, запись результата в xmm2
@@ -83,7 +82,6 @@ GF_Multiply PROC						; rcx - a (первый элемент)
 	pxor xmm1, xmm0						; сложение xmm1 и xmm0 в поле
 	pclmulqdq xmm1, Modulo, 01h			; умножение старшей половины xmm1 на младшую половину Modulo, результат в xmm1
 	pxor xmm0, xmm1						; сложение xmm0 и xmm1 в поле
-	pand xmm0, Mask64					; выделение младших 64-х бит
 	pextrq rax, xmm0, 0h				; пересылка младших 64-х бит xmm0 на rax 
 	ret									; возвращается значение rax
 GF_Multiply ENDP
@@ -193,7 +191,6 @@ PolyMulConst ENDP
 ; Возвращаемое значение всегда равно -1
 PolyZero PROC							; rcx - указатель на массив a
 										; edx - степень многочлена deg, является типом int
-	ALIGN 16
 	cmp edx, -1							; сравнение deg и -1
 	je m2;								; завершение процедуры, так как многочлен уже равен 0
 	pxor xmm0, xmm0						; обнуление xmm0
